@@ -88,39 +88,6 @@ class Planet(db.Model):
             "terrain": self.terrain,
         }
 
-class Vehicle(db.Model):
-    __tablename__ = 'vehicle'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    model = db.Column(db.String(50))
-    manufacturer = db.Column(db.String(50))
-    cost_in_credits = db.Column(db.Integer)
-    length = db.Column(db.String(20))
-    max_atmosphering_speed = db.Column(db.String(20))
-    crew = db.Column(db.String(20))
-    passengers = db.Column(db.String(20))
-    cargo_capacity = db.Column(db.String(20))
-    consumables = db.Column(db.String(50))
-    vehicle_class = db.Column(db.String(50))
-
-    def __repr__(self):
-        return '<Vehicle %r>' % self.name
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "model": self.model,
-            "manufacturer": self.manufacturer,
-            "cost_in_credits": self.cost_in_credits,
-            "length": self.length,
-            "max_atmosphering_speed": self.max_atmosphering_speed,
-            "crew": self.crew,
-            "passengers": self.passengers,
-            "cargo_capacity": self.cargo_capacity,
-            "consumables": self.consumables,
-            "vehicle_class": self.vehicle_class,
-        }
 
 class Favorites(db.Model):
     __tablename__ = 'favorites'   
@@ -128,12 +95,10 @@ class Favorites(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     character_id = db.Column(db.Integer, db.ForeignKey('character.id'), nullable=True)
     planet_id = db.Column(db.Integer, db.ForeignKey('planet.id'), nullable=True)
-    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicle.id'), nullable=True)
 
     user = db.relationship('User', backref='favorites')
     character = db.relationship('Character', backref='favorites')
     planet = db.relationship('Planet', backref='favorites')
-    vehicle = db.relationship('Vehicle', backref='favorites')
 
     def __repr__(self):
         return '<Favorite %r>' % self.id
@@ -143,6 +108,5 @@ class Favorites(db.Model):
             "id": self.id,
             "user_id": self.user_id,
             "character_id": self.character_id,
-            "planet_id": self.planet_id,
-            "vehicle_id": self.vehicle_id
+            "planet_id": self.planet_id
         }
