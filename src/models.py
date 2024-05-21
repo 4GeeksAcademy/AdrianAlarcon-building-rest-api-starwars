@@ -1,12 +1,18 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
 class User(db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    username = db.Column(db.String(20), nullable=False, unique=True)
+    firstname = db.Column(db.String(20), nullable=False)
+    lastname = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(80), nullable=False)
+    subscription_date = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -14,6 +20,129 @@ class User(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "username": self.username,
+            "firstname": self.firstname,
+            "lastname": self.lastname,
             "email": self.email,
-            # do not serialize the password, its a security breach
+            "subscription_date": self.subscription_date.isoformat(),
+            "is_active": self.is_active
+        }
+
+class Character(db.Model):
+    __tablename__ = 'character'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    birth_year = db.Column(db.String(10))
+    eye_color = db.Column(db.String(10))
+    gender = db.Column(db.String(10))
+    hair_color = db.Column(db.String(20))
+    height = db.Column(db.String(10))
+    mass = db.Column(db.String(10))
+    skin_color = db.Column(db.String(20))
+    homeworld = db.Column(db.String(100))
+
+    def __repr__(self):
+        return '<Character %r>' % self.name
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "birth_year": self.birth_year,
+            "eye_color": self.eye_color,
+            "gender": self.gender,
+            "hair_color": self.hair_color,
+            "height": self.height,
+            "mass": self.mass,
+            "skin_color": self.skin_color,
+            "homeworld": self.homeworld,
+        }
+
+class Planet(db.Model):
+    __tablename__ = 'planet'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    climate = db.Column(db.String(50))
+    diameter = db.Column(db.String(20))
+    gravity = db.Column(db.String(20))
+    orbital_period = db.Column(db.String(20))
+    population = db.Column(db.Integer)
+    rotation_period = db.Column(db.String(20))
+    surface_water = db.Column(db.String(20))
+    terrain = db.Column(db.String(50))
+
+    def __repr__(self):
+        return '<Planet %r>' % self.name
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "climate": self.climate,
+            "diameter": self.diameter,
+            "gravity": self.gravity,
+            "orbital_period": self.orbital_period,
+            "population": self.population,
+            "rotation_period": self.rotation_period,
+            "surface_water": self.surface_water,
+            "terrain": self.terrain,
+        }
+
+class Vehicle(db.Model):
+    __tablename__ = 'vehicle'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    model = db.Column(db.String(50))
+    manufacturer = db.Column(db.String(50))
+    cost_in_credits = db.Column(db.Integer)
+    length = db.Column(db.String(20))
+    max_atmosphering_speed = db.Column(db.String(20))
+    crew = db.Column(db.String(20))
+    passengers = db.Column(db.String(20))
+    cargo_capacity = db.Column(db.String(20))
+    consumables = db.Column(db.String(50))
+    vehicle_class = db.Column(db.String(50))
+
+    def __repr__(self):
+        return '<Vehicle %r>' % self.name
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "model": self.model,
+            "manufacturer": self.manufacturer,
+            "cost_in_credits": self.cost_in_credits,
+            "length": self.length,
+            "max_atmosphering_speed": self.max_atmosphering_speed,
+            "crew": self.crew,
+            "passengers": self.passengers,
+            "cargo_capacity": self.cargo_capacity,
+            "consumables": self.consumables,
+            "vehicle_class": self.vehicle_class,
+        }
+
+class Favorites(db.Model):
+    __tablename__ = 'favorites'   
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    character_id = db.Column(db.Integer, db.ForeignKey('character.id'), nullable=True)
+    planet_id = db.Column(db.Integer, db.ForeignKey('planet.id'), nullable=True)
+    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicle.id'), nullable=True)
+
+    user = db.relationship('User', backref='favorites')
+    character = db.relationship('Character', backref='favorites')
+    planet = db.relationship('Planet', backref='favorites')
+    vehicle = db.relationship('Vehicle', backref='favorites')
+
+    def __repr__(self):
+        return '<Favorite %r>' % self.id
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "character_id": self.character_id,
+            "planet_id": self.planet_id,
+            "vehicle_id": self.vehicle_id
         }
