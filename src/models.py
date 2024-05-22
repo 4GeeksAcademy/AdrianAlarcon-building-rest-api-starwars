@@ -10,9 +10,6 @@ class User(db.Model):
     firstname = db.Column(db.String(20), nullable=False)
     lastname = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
-    subscription_date = db.Column(db.DateTime, default=datetime.utcnow)
-    is_active = db.Column(db.Boolean, default=True, nullable=False)
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -24,8 +21,6 @@ class User(db.Model):
             "firstname": self.firstname,
             "lastname": self.lastname,
             "email": self.email,
-            "subscription_date": self.subscription_date.isoformat(),
-            "is_active": self.is_active
         }
 
 class Character(db.Model):
@@ -39,7 +34,9 @@ class Character(db.Model):
     height = db.Column(db.String(10))
     mass = db.Column(db.String(10))
     skin_color = db.Column(db.String(20))
-    homeworld = db.Column(db.String(100))
+    homeworld_id = db.Column(db.Integer, db.ForeignKey('planet.id'), nullable=True)
+
+    homeworld = db.relationship('Planet', backref='characters')
 
     def __repr__(self):
         return '<Character %r>' % self.name
@@ -55,7 +52,7 @@ class Character(db.Model):
             "height": self.height,
             "mass": self.mass,
             "skin_color": self.skin_color,
-            "homeworld": self.homeworld,
+            "homeworld": self.homeworld.name if self.homeworld else None,
         }
 
 class Planet(db.Model):
@@ -87,7 +84,6 @@ class Planet(db.Model):
             "surface_water": self.surface_water,
             "terrain": self.terrain,
         }
-
 
 class Favorites(db.Model):
     __tablename__ = 'favorites'   
